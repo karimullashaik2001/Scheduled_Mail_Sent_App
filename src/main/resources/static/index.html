@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Form</title>
+<style>
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.form-container {
+	background-color: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+	width: 300px;
+}
+
+form h2 {
+	text-align: center;
+	color: #333;
+	margin-bottom: 20px;
+}
+
+label {
+	display: block;
+	margin: 10px 0 5px;
+	color: #333;
+}
+
+input[type="email"], input[type="date"], input[type="time"] {
+	width: calc(100% - 20px);
+	padding: 8px 10px;
+	margin-bottom: 15px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+input[type="checkbox"] {
+	margin-right: 5px;
+}
+
+button {
+	width: 100%;
+	padding: 10px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+}
+
+button:hover {
+	background-color: #0056b3;
+}
+
+.message {
+	color: green;
+	margin-top: 10px;
+	text-align: center;
+}
+
+.error {
+	color: red;
+	margin-top: 10px;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<div class="form-container">
+		<form id="emailForm" onsubmit="submitForm(event)">
+			<h2>Schedule an Email</h2>
+			<label for="email">Email Address:</label> <input type="email"
+				id="email" name="email" placeholder="Enter your email" required>
+			<label for="sendCheckbox">Send Confirmation Email:</label> <input
+				type="checkbox" id="sendCheckbox" name="sendCheckbox"> <label
+				for="date">Select Date:</label> <input type="date" id="date"
+				name="date"> <label for="time">Select Time:</label> <input
+				type="time" id="time" name="time">
+			<button type="submit" id="sendButton">Send</button>
+			<p id="message" class="message"></p>
+			<p id="error" class="error"></p>
+		</form>
+	</div>
+
+	<script>
+        function submitForm(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Capture the form data
+            const email = document.getElementById('email').value;
+            const sendCheckbox = document.getElementById('sendCheckbox').checked;
+            const date = document.getElementById('date').value || null;
+            const time = document.getElementById('time').value || null;
+
+            const data = {
+                email: email,
+                sendCheckbox: sendCheckbox,
+                date: date,
+                time: time
+            };
+
+            // Send the form data to the controller using Fetch API
+            fetch('/sendEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(responseData => {
+                const messageElement = document.getElementById('message');
+                const errorElement = document.getElementById('error');
+                if (responseData.success) {
+                    messageElement.textContent = responseData.success;
+                    errorElement.textContent = '';
+                } else if (responseData.error) {
+                    messageElement.textContent = '';
+                    errorElement.textContent = responseData.error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
